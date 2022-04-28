@@ -9,11 +9,8 @@ Build and Deploy:
   script:
     - echo "Building docker image"
     - docker-compose up -d --build
+  after_script:
     - docker system prune -f
-    - yarn
-    - cp .env.production .env
-    - npx directus database migrate:latest
-    - pm2 start
   only:
     - master
   tags:
