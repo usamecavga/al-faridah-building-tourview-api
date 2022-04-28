@@ -18,10 +18,11 @@ services:
     volumes:
       - /tourview/postgres/tourview:/var/lib/postgresql/data
   redis:
+    container_name: redis
     restart: unless-stopped
     image: redis:latest
     volumes:
-      - ~/tourview/redis:/data
+      - /tourview/redis:/data
     ports:
       - 6379:6379
     expose:
