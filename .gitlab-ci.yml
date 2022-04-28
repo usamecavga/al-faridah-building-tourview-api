@@ -1,0 +1,20 @@
+image: docker:latest
+
+before_script:
+  - echo "Before script section"
+  - docker info
+
+Build and Deploy:
+  stage: build
+  script:
+    - echo "Building docker image"
+    - docker-compose up -d --build
+    - docker system prune -f
+    - yarn
+    - cp .env.production .env
+    - npx directus database migrate:latest
+    - pm2 start
+  only:
+    - master
+  tags:
+    - al-faridah-building-tourview-api
