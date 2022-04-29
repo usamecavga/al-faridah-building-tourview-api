@@ -9,7 +9,6 @@ COPY ./ .
 
 RUN yarn
 RUN cp .env.production .env
-RUN npx directus database migrate:latest
 
 EXPOSE 8055
 
