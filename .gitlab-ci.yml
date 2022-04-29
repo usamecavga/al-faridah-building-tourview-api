@@ -8,7 +8,7 @@ Build and Deploy:
   stage: build
   script:
     - echo "Building docker image"
-    - docker-compose up -d --build
+    - docker-compose up -d --build  --no-cache
   after_script:
     - docker system prune -f
   only:
