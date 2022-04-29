@@ -13,7 +13,7 @@ Build:
   only:
     - master
   tags:
-    - al-faridah-building-backend
+    - al-faridah-building-tourview-api
    
 Deploy:
   stage: deploy
@@ -26,4 +26,4 @@ Deploy:
   only:
     - master
   tags:
-    - al-faridah-building-backend
+    - al-faridah-building-tourview-api
