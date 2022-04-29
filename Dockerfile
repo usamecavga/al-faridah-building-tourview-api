@@ -8,6 +8,7 @@ ENV NODE_ENV=${NODE_ENV}
 COPY ./ .
 
 RUN yarn
+RUN yarn global add pm2
 RUN cp .env.production .env
 
 EXPOSE 8055
