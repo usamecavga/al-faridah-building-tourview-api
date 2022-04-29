@@ -9,6 +9,7 @@ Build and Deploy:
   script:
     - echo "Building docker image"
     - docker-compose up -d --build
+    - npm i -g yarn
     - yarn
     - yarn global add pm2
     - cp .env.production .env
