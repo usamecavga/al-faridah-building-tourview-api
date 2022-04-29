@@ -41,6 +41,9 @@ services:
       - 8055
     networks:
       - internal
+    depends_on:
+      - postgres
+      - redis
 networks:
   internal:
     driver: bridge
