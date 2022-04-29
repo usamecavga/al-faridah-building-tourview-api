@@ -4,14 +4,26 @@ before_script:
   - echo "Before script section"
   - docker info
 
-Build and Deploy:
+
+Build:
   stage: build
   script:
     - echo "Building docker image"
-    - docker-compose up -d --build  --no-cache
+    - docker-compose build --no-cache
+  only:
+    - master
+  tags:
+    - al-faridah-building-backend
+   
+Deploy:
+  stage: deploy
+  script:
+    - echo "Deploying docker image"
+    - docker-compose up -d
   after_script:
+    - echo "After script section"
     - docker system prune -f
   only:
     - master
   tags:
-    - al-faridah-building-tourview-api
+    - al-faridah-building-backend
