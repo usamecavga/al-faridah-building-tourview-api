@@ -1,4 +1,4 @@
-image: docker:latest
+image: node:lts-alpine
 
 before_script:
   - echo "Before script section"
@@ -9,8 +9,12 @@ Build and Deploy:
   script:
     - echo "Building docker image"
     - docker-compose up -d --build
+    - yarn
+    - yarn global add pm2
+    - cp .env.production .env
   after_script:
     - docker system prune -f
+    - pm2 start
   only:
     - master
   tags:

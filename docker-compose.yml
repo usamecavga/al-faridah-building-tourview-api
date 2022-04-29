@@ -31,21 +31,6 @@ services:
       - 6379
     networks:
       - internal
-  tourview-api:
-    container_name: tourview-api
-    restart: unless-stopped
-    image: tourview-api
-    build:
-      context: .
-    ports:
-      - 8055:8055
-    expose:
-      - 8055
-    networks:
-      - internal
-    depends_on:
-      postgres:
-        condition: service_healthy
 networks:
   internal:
     driver: bridge
