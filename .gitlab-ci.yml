@@ -9,7 +9,7 @@ Build and Deploy:
     - echo "Building docker image"
     - docker-compose up -d --build
     - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
-    - nvm install node
+    - /home/gitlab-runner/.nvm/nvm.sh install node
     - npm i -g yarn
     - yarn
     - yarn global add pm2
