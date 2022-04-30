@@ -22,7 +22,7 @@ services:
     restart: unless-stopped
     image: redis:latest
     volumes:
-      - /tourview/redis:/data
+      - tourview-redis:/data
     ports:
       - 6379:6379
     expose:
@@ -32,4 +32,6 @@ services:
 networks:
   internal:
     driver: bridge
+volumes:
+  tourview-redis:
     
