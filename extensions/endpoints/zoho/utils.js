@@ -19,7 +19,6 @@ module.exports.setTokens = async (settingsService = null) => {
         await settingsService
             .readByQuery({ fields: ['z_t'] })
             .then(async (results) => {
-
                 console.warn("results >> ", results[0]);
                 var code = results[0].z_t;
                 const client = new AuthorizationCode(config);
@@ -36,7 +35,7 @@ module.exports.setTokens = async (settingsService = null) => {
                 console.warn("accessToken >> ", accessToken);
 
                 rclient.set('__tokens', JSON.stringify(accessToken));
-                return accessToken;
+                return true;
 
             })
             .catch((error) => {
