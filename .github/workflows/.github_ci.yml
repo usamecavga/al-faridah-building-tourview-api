@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v2
+      - name: Docker Up
+        run: docker-compose up -d --build
+      - name: Install Packages
+        run: yarn
+      - name: .env file creation
+        run: cp .env.production .env
+      - name: Directus Migrate
+        run: npx directus database migrate:latest
+      - name: Start Directus
+        run: pm2 start
