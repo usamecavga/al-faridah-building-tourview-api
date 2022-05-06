@@ -13,7 +13,11 @@ const config = {
 module.exports.setTokens = async (settingsService = null) => {
     const { AuthorizationCode } = require('simple-oauth2');
     const redis = require('redis');
-    const rclient = redis.createClient();
+    const rclient = redis.createClient({
+        socket: {
+            port: 7480
+        }
+      });
     rclient.connect();
     try {
         await settingsService
@@ -54,7 +58,11 @@ module.exports.refreshToken = async () => {
     const axios = require('axios');
     const redis = require('redis');
     try {
-        const rclient = redis.createClient();
+        const rclient = redis.createClient({
+            socket: {
+                port: 7480
+            }
+          });
         rclient.connect();
         var tokens = JSON.parse(await rclient.get('__tokens'));
         console.warn("tokens refreshToken >> ", tokens);
@@ -83,7 +91,11 @@ module.exports.refreshToken = async () => {
 
 module.exports.getTokens = async () => {
     const redis = require('redis');
-    const rclient = redis.createClient();
+    const rclient = redis.createClient({
+        socket: {
+            port: 7480
+        }
+      });
     rclient.connect();
 
     try {
