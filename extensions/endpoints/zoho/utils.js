@@ -156,7 +156,9 @@ module.exports.getProducts = async (page = 1, settingsService) => {
         if (productsResponse.info.more_records) {
             await this.getProducts(++page);
         }
-        return products;
+        const returnProduct = _.clone(products)
+        products = [];
+        return returnProduct;
     } catch (e) {
         console.warn("error.message >> ", e);
         if (e.response.status === 401) {
