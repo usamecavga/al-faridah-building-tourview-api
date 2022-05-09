@@ -3,29 +3,9 @@ module.exports = function registerEndpoint(router, { services, env, database }) 
     var utils = require('./utils');
     router.get('/sync-units', async (req, res, next) => {
         const unitsService = new ItemsService('units', { schema: req.schema });
-        // console.warn("unitsService >> ", unitsService);
         const settingsService = new ItemsService('settings', { schema: req.schema });
-        const products = await utils.getProducts(1, settingsService);
+        const products = await utils.get(1, settingsService, unitsService);
         if (products) {
-            console.warn("products.lenght >> ", products.length);
-            await products.map((product) => {
-                unitsService
-                    .readByQuery({
-                        filter: {
-                            name: product.Product_Name
-                        }
-                    })
-                    .then(async (results) => {
-                        if (results[0]) {
-                            console.warn("results >> ", product.Product_Name, results[0].id);
-                            unitsService.updateOne(results[0].id, {
-                                status: product.Product_Active ? 'available' : 'rent'
-                            })
-                        } else {
-                            console.warn("results else >> ", product.Product_Name, results);
-                        }
-                    })
-            });
             res.status(200).json({ success: true })
         } else {
             res.status(500).json({ success: false })

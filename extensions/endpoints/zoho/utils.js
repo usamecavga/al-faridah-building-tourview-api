@@ -10,17 +10,17 @@ const config = {
 
     }
 };
-module.exports.setTokens = async (settingsService = null) => {
+setTokens = async (settingsService = null) => {
     const { AuthorizationCode } = require('simple-oauth2');
     const redis = require('redis');
     const rclient = redis.createClient({
         socket: {
             port: 7480
         }
-      });
+    });
     rclient.connect();
     try {
-        await settingsService
+        return await settingsService
             .readByQuery({ fields: ['z_t'] })
             .then(async (results) => {
                 console.warn("results >> ", results[0]);
@@ -54,7 +54,7 @@ module.exports.setTokens = async (settingsService = null) => {
 }
 
 
-module.exports.refreshToken = async () => {
+refreshToken = async () => {
     const axios = require('axios');
     const redis = require('redis');
     try {
@@ -62,7 +62,7 @@ module.exports.refreshToken = async () => {
             socket: {
                 port: 7480
             }
-          });
+        });
         rclient.connect();
         var tokens = JSON.parse(await rclient.get('__tokens'));
         console.warn("tokens refreshToken >> ", tokens);
@@ -70,8 +70,7 @@ module.exports.refreshToken = async () => {
             method: 'post',
             baseURL: 'https://accounts.zoho.com',
             headers: {
-                "content-type": "application/json",
-                "authorization": "apikey 7M4A8FKVmnhvTDahnprAYy:0tarnFdphk0IX3W3fSJDNT"
+                "content-type": "application/json"
             }
         };
         options.url = `/oauth/v2/token?refresh_token=${tokens.refresh_token}&client_id=${config.client.id}&client_secret=${config.client.secret}&grant_type=refresh_token`
@@ -89,29 +88,30 @@ module.exports.refreshToken = async () => {
     }
 }
 
-module.exports.getTokens = async () => {
+getTokens = async () => {
     const redis = require('redis');
     const rclient = redis.createClient({
         socket: {
             port: 7480
         }
-      });
+    });
     rclient.connect();
 
     try {
+        if (!rclient.get('__tokens'))
+            return false;
         return JSON.parse(await rclient.get('__tokens'))
     } catch (e) {
         return { error: e };
     }
 }
-var products = [];
 
-module.exports.getProducts = async (page = 1, settingsService) => {
+var products = [];
+getUnits = async (page = 1, settingsService, unitsService) => {
     const axios = require('axios');
     var _ = require('lodash');
-    const tokens = await this.getTokens();
-    if (!tokens?.access_token) {
-        var result = await this.setTokens(settingsService);
+    if (!await getTokens()) {
+        var result = await setTokens(settingsService);
         console.warn("result >> ", result);
         if (!result) {
             var options = {
@@ -137,6 +137,7 @@ module.exports.getProducts = async (page = 1, settingsService) => {
         }
     }
     console.warn("page >> ", page);
+    const tokens = await getTokens();
     var options = {
         method: 'get',
         baseURL: 'https://www.zohoapis.com/crm/v2.1/',
@@ -152,21 +153,45 @@ module.exports.getProducts = async (page = 1, settingsService) => {
     try {
         var response = await axios(options);
         const productsResponse = response.data;
-        products = _.concat(products, productsResponse.data)
-        if (productsResponse.info.more_records) {
-            await this.getProducts(++page);
+        console.warn("productsResponse.info >> ", productsResponse.info);
+        const p = productsResponse.data
+        if (p) {
+            await p.map((product) => {
+                unitsService
+                    .readByQuery({
+                        filter: {
+                            name: product.Product_Name
+                        }
+                    })
+                    .then(async (results) => {
+                        if (results[0]) {
+                            console.warn("results >> ", product.Product_Name, results[0].id);
+                            unitsService.updateOne(results[0].id, {
+                                status: product.Product_Active ? 'available' : 'rent'
+                            })
+                        } else {
+                            console.warn("results else >> ", product.Product_Name, results);
+                        }
+                    })
+            });
+            await getUnits(++page, settingsService, unitsService);
+        } else {
+            return true;
         }
-        const returnProduct = _.cloneDeep(products)
-        products = [];
-        return returnProduct;
     } catch (e) {
-        console.warn("error.message getProducts >> ", e);
+        console.warn("error.message getUnits >> ", e);
         if (e.response.status === 401) {
-            await this.refreshToken();
-            this.getProducts();
-            return;
+            await refreshToken();
+            await getUnits(1, settingsService, unitsService);
+        }else{
+            return { error: e };
         }
-        return { error: e };
-        // res.status(500).json({ error: e });
+    }
+}
+
+module.exports = {
+    get: async (page, settingsService, unitsService) => {
+        const rp = await getUnits(page, settingsService, unitsService)
+        return true;
     }
 }
