@@ -83,7 +83,7 @@ module.exports.refreshToken = async () => {
         rclient.set('__tokens', JSON.stringify(accessToken));
         Promise.resolve(response);
     } catch (e) {
-        console.warn("error.message >> ", e);
+        console.warn("error.message refreshToken >> ", e);
         return { error: e };
         // res.status(500).json({ error: e });
     }
@@ -160,7 +160,7 @@ module.exports.getProducts = async (page = 1, settingsService) => {
         products = [];
         return returnProduct;
     } catch (e) {
-        console.warn("error.message >> ", e);
+        console.warn("error.message getProducts >> ", e);
         if (e.response.status === 401) {
             await this.refreshToken();
             this.getProducts();
