@@ -165,12 +165,11 @@ getUnits = async (page = 1, settingsService, unitsService) => {
                     })
                     .then(async (results) => {
                         if (results[0]) {
-                            console.warn("results >> ", product.Product_Name, results[0].id);
                             unitsService.updateOne(results[0].id, {
                                 status: product.Product_Active ? 'available' : 'rent'
                             })
                         } else {
-                            console.warn("results else >> ", product.Product_Name, results);
+                            // console.warn("results else >> ", product.Product_Name, results);
                         }
                     })
             });
